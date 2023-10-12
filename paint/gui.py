@@ -70,7 +70,11 @@ class DefaultWindow(Tk):
         model = self.config['model']
         print(models)
         modelSelector['values'] = models
-        modelSelector.current(models.index(model))
+        # Catch potential error due to bad config
+        try : 
+            modelSelector.current(models.index(model))
+        except:
+            modelSelector.current(0)
         modelSelector.grid(column=2, row=2)
 
         # Control Sampler.
@@ -82,7 +86,11 @@ class DefaultWindow(Tk):
         samplerSelector = ttk.Combobox(mainframe, width=50, text=self.samplerSelectorVar)
         samplers = [i['name'] for i in requests.get(f'{SD_PATH}/sdapi/v1/samplers').json()]
         samplerSelector['values'] = samplers
-        samplerSelector.current(samplers.index(sampler))
+        # (same)
+        try : 
+            samplerSelector.current(models.index(sampler))
+        except:
+            samplerSelector.current(0)
         samplerSelector.grid(column=5, row=2)
 
         # ControlNet Type
