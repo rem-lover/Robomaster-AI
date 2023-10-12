@@ -1,0 +1,18 @@
+1.	Install	python 3.10.6 (newest version doens't work)
+2. 	Install StableDiffusion Automatic1111 webui
+3. 	If you have two python versions installed, specify the path to the 3.10.6 version in the webui-user.bat
+4.	Run the webui-user.bat
+5.	Download your desired models from civitai
+
+At this point you can already use it, but below are some quality of life or extra stuff which i like to use
+They are all optional but are nice to have and play with
+
+5.	Download https://www.patreon.com/file?h=79649068&i=15686449 which includes some default negatives and styles
+6.	Install Controlnet
+7. 	Install Roop (can install multiple)
+8.	Install Deforum
+9. 	Install Openpose Editor
+10.	Install Aspect ratio helper
+11. Install mov2mov
+12.	Install adetailer
+13. Install image browser

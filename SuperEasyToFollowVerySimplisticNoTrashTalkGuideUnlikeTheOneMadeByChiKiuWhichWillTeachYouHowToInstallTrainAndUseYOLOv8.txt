@@ -1,0 +1,27 @@
+1. 	Install cuda 12.1 (not the newest version as pytorch doesn't support it) and cudnn for gpu accel
+2. 	Install newest python
+3. 	Install ultralytics module
+4. 	Refer to "https://docs.ultralytics.com/"
+5. 	Install pytorch nightly
+6. 	Modify the settings as needed
+7. 	Download an annotated dataset from DJI hub
+8. 	Write a converter script to convert the dataset from DJI format to yolov8 format
+9. 	Train a pretrained model with the dataset
+		Remember to use gpu, cpu runs very slow (from 80x to 135x slower)
+		So definitly use gpu to train
+		For reference, around 4it/s on RTX3060 
+10. Look at the results and repeat the training with "best.pt"
+11.	Write a training script and train until it overfits
+		Brief explanation of overfit:
+		When the training loss continues to decrease but validation loss increases, overfit occurs
+12. Write a predicting script and use the "best.pt" to predict on a new video
+13. Convert the results back to DJI format and import it
+14. You definitly have to check every frame by hand before using it, don't be lazy
+		As the saying goes,'Garbage in, Garbage out'
+		The dji model will not perform well if you give it sh!t data
+		So remeber to check every single frame and every single label of the output berfore using it
+
+That's it if you only want to use yolov8 to generate more datasets for robomaster
+For other applications, use google and learn it yourself, the ability to google and self-learn is very important :)
+So if you encounter any problems when writing the various python scripts, try to solve it yourself
+Try not to come cry to me immediately,  but I welcome any questions nonetheless
