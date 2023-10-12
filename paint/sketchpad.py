@@ -4,8 +4,8 @@ class Sketchpad(Canvas):
 
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
-        self.bind("<Button-1>", self.savePosn)
-        self.bind("<B1-Motion>",self.addLine)
+        # self.bind("<Button-1>", self.savePosn)
+        # self.bind("<B1-Motion>",self.addLine)
         self.brushSize = 5
         self.color = None
 

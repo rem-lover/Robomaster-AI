@@ -1,0 +1,5 @@
+{
+ "model": "anything-v4.0-pruned",
+ "sampler": "DPM++ 2M Karras",
+ "wait_time": 1
+}

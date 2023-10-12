@@ -30,12 +30,15 @@ class Backend:
         # Necessary.
         self.queue = multiprocessing.Queue()
         self.ProgressQueue = multiprocessing.Queue()
+        # How do you think we got this? Much effort.
+        self.badwords = "torture, penetration, unbirth, unusual pupils, urethra, urination, urine, vomit, x-ray, wet clothes, transparent clothes, yaoi, yandere, yuri, lesbian, selfcest, shibari, shemale, snuff, strap-on, stuck in wall, spanking, whipping, hitting, squirting, tanlines, tentacles, vibrator, dildo, sex toys, vibrating egg, panty, piss, prostitution, prostate massage, pregnant, rape, rimjob, ryona, saliva, threesome, nakadashi, netorare, navel fuck, necrophilia, nudity, nose fuck, nose hook, lactation, gay, bisexual, LGBTQ+, leash, scat, smegma, masturbation, mensuration, milking, mind control, mind break, rolled eyes, extended tongue ,gay sex, forniphilia, furry, gaping, futanari,glory hole, amputee, cum bucket,headless, harem, hentai, horse cock, human cattle, humiliation, impregnation, incest, inflation, french kissing, milf, dilf, enema, ear fuck, exhibitionism, exposed clothing, voyeur, facesitting, pubic hair, fisting, footjob, cannibalism, chastity belt, chikan, cervix, orgasm, paizuri, cock, condom, semen, sperm, deepthroat, defloration, domination, submissive, sadistic, asphyxiation, bondage, bdsm, slave, bound, testicles, bikini, penis, breast feeding, bukkake, blowjob, orgy, gangbang, petplay, sex, 69, ahegao, anal, anus, butthole, ass, asshole, butt, prolapse, armpit sex, anthology, swimsuit, bra, lace, latex suit,ropes, ball gag, big breast, pussy, cunt, bitch, beastiality, rule34, adult content, gore, vore, blood, guro, violent, internal organs, weird, disgusting, ugly, vomiting, bad skin, illness, decayed skin, scary, underwear, ligerie, exposed clothing, sexy, nipples, boobs, clitoris, cunt, vagina".replace(', ', ',').split(',')
+            
 
-    def send_img2img(self, sketchboard, logger, positive_prompt, seed, image, sd_model, cnetmodel, cnetpreprocessor, url):
+    def send_img2img(self, sketchboard, logger, positive_prompt, seed, sampler, image, sd_model, cnetmodel, cnetpreprocessor, weight, url):
         self.logger = logger
         logger.info(f"received prompt \"{positive_prompt}\"\nControlNet Model={cnetmodel}\nControlNet Preprocessor={cnetpreprocessor}")
         
-        logger.debug(cnetmodel == "None" or cnetpreprocessor == "None")
+        # logger.debug(cnetmodel == "None" or cnetpreprocessor == "None")
         # Validation of proper prompt
 
         # Raising a ValueError blocks the thread. However, as long as I return on this thread, the function will not have any outputs.
@@ -58,7 +61,7 @@ class Backend:
             # b = ttk.Button(win, text="Close", command=win.destroy)
             # b.grid(row=1, column=0)
             
-        logger.debug(not positive_prompt)
+        # logger.debug(not positive_prompt)
         if not positive_prompt:
             # raise ValueError("No prompt")
             win = tk.Toplevel()
@@ -68,7 +71,7 @@ class Backend:
             win.destroy()
             sketchboard.delete("all")
             return
-            
+
         # Local requests are fast. This is a necessary step. You should know that.
         response = requests.get(url=f'{url.strip("/sdapi/v1/img2img")}/sdapi/v1/options')
         logger.debug(response.json()['sd_model_checkpoint'])
@@ -78,25 +81,28 @@ class Backend:
         }
 
         response = requests.post(url=f'{url.strip("/sdapi/v1/img2img")}/sdapi/v1/options', json=option_payload)
-        logger.debug(response.status_code)
+        logger.debug(f'options rescode -> {response.status_code}')
 
         payload = {
             "prompt":positive_prompt,
-            "negative_prompt":"(torture, penetration, unbirth, unusual pupils, urethra, urination, urine, vomit, x-ray, wet clothes, transparent clothes, yaoi, yandere, yuri, lesbian, selfcest, shibari, shemale, snuff, strap-on, stuck in wall, spanking, whipping, hitting, squirting, tanlines, tentacles, vibrator, dildo, sex toys, vibrating egg, panty, piss, prostitution, prostate massage, pregnant, rape, rimjob, ryona, saliva, threesome, nakadashi, netorare, navel fuck, necrophilia, nudity, nose fuck, nose hook, lactation, gay, bisexual, LGBTQ+, leash, scat, smegma, masturbation, mensuration, milking, mind control, mind break, rolled eyes, extended tongue ,gay sex, forniphilia, furry, gaping, futanari,glory hole, amputee, cum bucket,headless, harem, hentai, horse cock, human cattle, humiliation, impregnation, incest, inflation, french kissing, milf, dilf, enema, ear fuck, exhibitionism, exposed clothing, voyeur, facesitting, pubic hair, fisting, footjob, cannibalism, chastity belt, chikan, cervix, orgasm, paizuri, cock, condom, semen, sperm, deepthroat, defloration, domination, submissive, sadistic, asphyxiation, bondage, bdsm, slave, bound, testicles, bikini, penis, breast feeding, bukkake, blowjob, orgy, gangbang, petplay, sex, 69, ahegao, anal, anus, butthole, ass, asshole, butt, prolapse, armpit sex, anthology, swimsuit, bra, lace, latex suit,ropes, ball gag, big breast, pussy, cunt, bitch, beastiality, rule34, adult content, gore, vore, blood, guro, violent, internal organs, weird, disgusting, ugly, vomiting, bad skin, illness, decayed skin, scary, underwear, ligerie, exposed clothing, sexy, nipples, boobs, clitoris, cunt, vagina, NSFW, Cleavage, Pubic Hair, Nudity, Naked, Au naturel, Watermark, Text, censored, deformed, bad anatomy, disfigured, poorly drawn face, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, disconnected head, malformed hands, long neck, mutated hands and fingers, bad hands, missing fingers, cropped, worst quality, low quality, mutation, poorly drawn, huge calf, bad hands, fused hand, missing hand, disappearing arms, disappearing thigh, disappearing calf, disappearing legs, missing fingers, fused fingers, abnormal eye proportion, Abnormal hands, abnormal legs, abnormal feet,  abnormal fingers : 2)", # Add more here
+            # "negative_prompt":"(torture, penetration, unbirth, unusual pupils, urethra, urination, urine, vomit, x-ray, wet clothes, transparent clothes, yaoi, yandere, yuri, lesbian, selfcest, shibari, shemale, snuff, strap-on, stuck in wall, spanking, whipping, hitting, squirting, tanlines, tentacles, vibrator, dildo, sex toys, vibrating egg, panty, piss, prostitution, prostate massage, pregnant, rape, rimjob, ryona, saliva, threesome, nakadashi, netorare, navel fuck, necrophilia, nudity, nose fuck, nose hook, lactation, gay, bisexual, LGBTQ+, leash, scat, smegma, masturbation, mensuration, milking, mind control, mind break, rolled eyes, extended tongue ,gay sex, forniphilia, furry, gaping, futanari,glory hole, amputee, cum bucket,headless, harem, hentai, horse cock, human cattle, humiliation, impregnation, incest, inflation, french kissing, milf, dilf, enema, ear fuck, exhibitionism, exposed clothing, voyeur, facesitting, pubic hair, fisting, footjob, cannibalism, chastity belt, chikan, cervix, orgasm, paizuri, cock, condom, semen, sperm, deepthroat, defloration, domination, submissive, sadistic, asphyxiation, bondage, bdsm, slave, bound, testicles, bikini, penis, breast feeding, bukkake, blowjob, orgy, gangbang, petplay, sex, 69, ahegao, anal, anus, butthole, ass, asshole, butt, prolapse, armpit sex, anthology, swimsuit, bra, lace, latex suit,ropes, ball gag, big breast, pussy, cunt, bitch, beastiality, rule34, adult content, gore, vore, blood, guro, violent, internal organs, weird, disgusting, ugly, vomiting, bad skin, illness, decayed skin, scary, underwear, ligerie, exposed clothing, sexy, nipples, boobs, clitoris, cunt, vagina, NSFW, Cleavage, Pubic Hair, Nudity, Naked, Au naturel, Watermark, Text, censored, deformed, bad anatomy, disfigured, poorly drawn face, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, disconnected head, malformed hands, long neck, mutated hands and fingers, bad hands, missing fingers, cropped, worst quality, low quality, mutation, poorly drawn, huge calf, bad hands, fused hand, missing hand, disappearing arms, disappearing thigh, disappearing calf, disappearing legs, missing fingers, fused fingers, abnormal eye proportion, Abnormal hands, abnormal legs, abnormal feet,  abnormal fingers : 2)", # Add more here
+            "negative_prompt" : "EasyNegative",
             "width":512,
             "height":512,
             "steps":20,
             "cfg":7,
             "seed":seed,
             "batch_size":1,
-            "sampler_name":"Euler", # TODO : Implement changing the sampler.
+            # "sampler_name":"Euler", TODO : Implement changing the sampler.
+            "sampler_name": sampler, # ^: Implemented !
             "init_images":[image],
             "alwayson_scripts": {
                 "controlnet": {
                     "args": [
                         {
                             "module":cnetpreprocessor,
-                            "model":cnetmodel
+                            "model":cnetmodel,
+                            "weight":weight
                         }
                     ]
                 }
@@ -110,7 +116,7 @@ class Backend:
         resp = requests.post(f'{url}/sdapi/v1/img2img', json=payload)
         
         r = resp.json()
-        logger.debug(f'r {resp.status_code}')
+        logger.debug(f'img2img r {resp.status_code}')
         image = r['images'][0]
         
         #image = None 
