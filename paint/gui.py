@@ -171,8 +171,8 @@ class DefaultWindow(Tk):
         # every time activationcheck is invoked, try to wait for one more second first, this wil be blocking in the alternate thread
         # (while loop to wait until self.pressing is changed, not in 1s return)
 
-        self.controlTypeVar.trace("w", lambda x, y, z: self.callAPI(self.sketchpad))
-        self.controlPreprocessorVar.trace("w", lambda x, y, z: self.callAPI(self.sketchpad))
+        self.controlTypeVar.trace("w", lambda x, y, z: self.dummyCallAPI2(self.sketchpad))
+        self.controlPreprocessorVar.trace("w", lambda x, y, z: self.dummyCallAPI2(self.sketchpad))
 
         def updateConfig(k, v):
             self.config[k] = v
@@ -184,7 +184,7 @@ class DefaultWindow(Tk):
         self.emptyCanvasButton = ttk.Button(mainframe, width=20, text="Clear", command = self.resetSketchySketch)
         self.emptyCanvasButton.grid(column=1,row=7)
 
-        self.forceGenerateButton = ttk.Button(mainframe, width=20, text="Generate", command = lambda : self.callAPI(self.sketchpad))
+        self.forceGenerateButton = ttk.Button(mainframe, width=20, text="Generate", command = lambda : self.dummyCallAPI2(self.sketchpad))
         self.forceGenerateButton.grid(column=2,row=7)
 
         self.saveImageButton = ttk.Button(mainframe, width=20, text='Save Image', command = self.saveImage)
@@ -204,20 +204,6 @@ class DefaultWindow(Tk):
         self.image.save(f)
 
     def updateControlWLabel(self, e): self.controlWLabel['text'] = f'Cnet_W: {self.controlWeight.get():.3f}'
-
-    def dummy1(self, state):
-        # self.logger.debug('dummy1')
-        self.changePressState()
-        self.dummyCallAPI(state) # for convenience, dummyCallAPI is called instead of just invoking callAPI directly
-
-    def dummy2(self, state):
-        self.sketchpad.savePosn(state)
-        self.changePressState()
-
-    def dummy3(self, state):
-        # self.logger.info(f'{self.pressing} -> {True}')
-        self.sketchpad.addLine(state)
-        self.pressing = True
 
     def changePressState(self):
         # self.logger.info(f'{self.pressing} -> {not self.pressing}')
@@ -247,6 +233,22 @@ class DefaultWindow(Tk):
         c = colorchooser.askcolor(title="choose smartass")
         self.sketchpad.color = c[-1]
 
+    # Segment: API-related. 
+    # Dummy functions are used, because I can't really 
+    def dummy1(self, state):
+        # self.logger.debug('dummy1')
+        self.changePressState()
+        self.dummyCallAPI(state) # for convenience, dummyCallAPI is called instead of just invoking callAPI directly
+
+    def dummy2(self, state):
+        self.sketchpad.savePosn(state)
+        self.changePressState()
+
+    def dummy3(self, state):
+        # self.logger.info(f'{self.pressing} -> {True}')
+        self.sketchpad.addLine(state)
+        self.pressing = True
+
     def activationCheck(self):
         # Avoid over-spam of our API. We do not want the image to like, not load.
         '''self.internalCount += 1
@@ -271,6 +273,13 @@ class DefaultWindow(Tk):
     def dummyCallAPI(self, eventObject):
 
         APIBackendThread = threading.Thread(target = self.callAPI, args = (eventObject, ),)#  name='apiBackend')
+        APIBackendThread.start()
+
+    # This is necessary to ensure that activationCheck does not block.
+    # An interface for the function that detects change in model.
+    def dummyCallAPI2(self, sketchpad_obj):
+
+        APIBackendThread = threading.Thread(target = self.callAPI, args = (sketchpad_obj, ),)#  name='apiBackend')
         APIBackendThread.start()
 
     def callAPI(self, eventObject):
