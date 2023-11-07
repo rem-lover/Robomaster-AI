@@ -1,10 +1,9 @@
 import requests
+import json
+
 
 url = 'http://127.0.0.1:7860'
 
-r = requests.get(url=f'{url}/sdapi/v1/options')
-
-for i, j in r.json().items():
-    print(i,':', j)
-
-# sd_model_checkpoint : realisticVisionV51_v51VAE
+response = requests.get(url=f'{url}/sdapi/v1/options')
+r = json.loads(response.text)
+print(r["sd_model_checkpoint"])
