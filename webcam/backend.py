@@ -17,8 +17,8 @@ def main(image, prompt='1girl'):
         "prompt": prompt,
         "negative_prompt": "underwear, ligerie, exposed clothing, sexy, nipples, boobs, clitoris, cunt, vagina, NSFW, Cleavage, Pubic Hair, Nudity, Naked, Au naturel, Watermark, Text, censored, deformed, bad anatomy, disfigured, poorly drawn face, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, disconnected head, malformed hands, long neck, mutated hands and fingers, bad hands, missing fingers, cropped, worst quality, low quality, mutation, poorly drawn, huge calf, bad hands, fused hand, missing hand, disappearing arms, disappearing thigh, disappearing calf, disappearing legs, missing fingers, fused fingers, abnormal eye proportion, Abnormal hands, abnormal legs, abnormal feet,  abnormal fingers",
         "batch_size": 1,
-        'sampler_name': 'Euler a',
-        "steps": 25,
+        'sampler_name': 'DDIM',
+        "steps": 10,
         "cfg_scale": 5,
         "alwayson_scripts": {
             "controlnet": {
@@ -29,15 +29,15 @@ def main(image, prompt='1girl'):
                         "model": "control_v11p_sd15_openpose [cab727d4]",
                         'weight': 2
                     },
-                    {
-                        "input_image": encoded_image,
-                        "module": "canny",
-                        "model": "control_v11p_sd15_canny [d14c016b]",
-                        'weight': 0.5,
-                        "guidance": 1,
-                        "guidance_start": 0,
-                        "guidance_end": 0.7,
-                    }
+                    # {
+                    #     "input_image": encoded_image,
+                    #     "module": "canny",
+                    #     "model": "control_v11p_sd15_canny [d14c016b]",
+                    #     'weight': 0.7,
+                    #     "guidance": 1,
+                    #     "guidance_start": 0,
+                    #     "guidance_end": 0.7,
+                    # }
                 ]
             }
         }
